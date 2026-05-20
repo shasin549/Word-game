@@ -26,7 +26,7 @@ async function startServer() {
     cors: { origin: '*' }
   });
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = 3000;
 
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
