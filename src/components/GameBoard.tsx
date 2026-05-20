@@ -20,6 +20,8 @@ export function GameBoard({ room, currentPlayerId, onGuess, onRematch }: GameBoa
 
   const myTargetWord = opponent?.secretWord || '';
   const opponentTargetWord = me?.secretWord || '';
+  const wordLen = myTargetWord.length || 8;
+  const oppWordLen = opponentTargetWord.length || 8;
 
   const { status, winnerId } = room;
   const isFinished = status === 'finished';
@@ -57,13 +59,13 @@ export function GameBoard({ room, currentPlayerId, onGuess, onRematch }: GameBoa
   }, [currentGuess, isFinished]);
 
   const handleKey = (key: string) => {
-    if (currentGuess.length < 6) setCurrentGuess(prev => prev + key);
+    if (currentGuess.length < wordLen) setCurrentGuess(prev => prev + key);
   };
   const handleBackspace = () => {
     setCurrentGuess(prev => prev.slice(0, -1));
   };
   const handleEnter = () => {
-    if (currentGuess.length !== 6) {
+    if (currentGuess.length !== wordLen) {
       triggerVibrate();
       return;
     }
@@ -91,16 +93,16 @@ export function GameBoard({ room, currentPlayerId, onGuess, onRematch }: GameBoa
            {Array.from({ length: 6 }).map((_, rIdx) => {
              const guess = opponent?.guesses[rIdx];
              return (
-               <div key={rIdx} className="flex gap-1">
-                 {Array.from({ length: 6 }).map((_, cIdx) => {
+               <div key={rIdx} className="flex gap-[3px] justify-center w-full">
+                 {Array.from({ length: oppWordLen }).map((_, cIdx) => {
                     let colorClass = "bg-neutral-800";
                     if (guess && opponentTargetWord) {
                       const res = evaluateGuess(guess, opponentTargetWord)[cIdx];
-                      if (res.status === 'correct') colorClass = "bg-emerald-500";
-                      else if (res.status === 'present') colorClass = "bg-amber-500";
+                      if (res?.status === 'correct') colorClass = "bg-emerald-500";
+                      else if (res?.status === 'present') colorClass = "bg-amber-500";
                       else colorClass = "bg-neutral-900";
                     }
-                    return <div key={cIdx} className={cn("w-3 h-3 rounded-sm", colorClass)} />
+                    return <div key={cIdx} className={cn("w-3 h-3 sm:w-4 sm:h-4 rounded-sm sm:rounded flex-shrink-0", colorClass)} />
                  })}
                </div>
              )
@@ -109,8 +111,8 @@ export function GameBoard({ room, currentPlayerId, onGuess, onRematch }: GameBoa
       </div>
 
       {/* Main Grid */}
-      <div className="flex-1 w-full max-w-lg mb-8">
-        <div className="grid grid-rows-6 gap-2 p-2">
+      <div className="flex-1 w-full max-w-2xl mb-8 flex flex-col items-center">
+        <div className="grid grid-rows-6 gap-2 w-full max-w-[500px]">
           {Array.from({ length: 6 }).map((_, rowIdx) => {
             const isCurrentRow = rowIdx === (me?.guesses.length || 0);
             const guess = isCurrentRow ? currentGuess : me?.guesses[rowIdx] || '';
@@ -120,17 +122,17 @@ export function GameBoard({ room, currentPlayerId, onGuess, onRematch }: GameBoa
             return (
               <motion.div 
                 key={rowIdx} 
-                className={cn("grid grid-cols-6 gap-2", isCurrentRow && isVibrating && "animate-shake")}
+                className={cn("flex justify-center gap-1 sm:gap-2", isCurrentRow && isVibrating && "animate-shake")}
                 animate={isCurrentRow && isVibrating ? { x: [-5, 5, -5, 5, 0] } : {}}
                 transition={{ duration: 0.3 }}
               >
-                {Array.from({ length: 6 }).map((_, colIdx) => {
+                {Array.from({ length: wordLen }).map((_, colIdx) => {
                   const letter = guess[colIdx] || '';
                   
                   let cellStyle = "border-neutral-800 bg-neutral-950 text-neutral-100";
                   if (letter && !isSubmitted) cellStyle = "border-neutral-600 bg-neutral-900 scale-[1.02]";
                   
-                  if (results) {
+                  if (results && results[colIdx]) {
                     const st = results[colIdx].status;
                     if (st === 'correct') cellStyle = "border-emerald-500 bg-emerald-500 text-neutral-950";
                     else if (st === 'present') cellStyle = "border-amber-500 bg-amber-500 text-neutral-950";
@@ -144,7 +146,7 @@ export function GameBoard({ room, currentPlayerId, onGuess, onRematch }: GameBoa
                       animate={isSubmitted ? { rotateX: 0 } : false}
                       transition={{ duration: 0.4, delay: colIdx * 0.1 }}
                       className={cn(
-                        "aspect-square flex items-center justify-center rounded-xl border-2 text-2xl sm:text-4xl font-black uppercase transition-colors",
+                        "w-[11vw] max-w-[56px] aspect-square flex items-center justify-center mb-1 rounded-lg sm:rounded-xl border-2 text-xl sm:text-3xl font-black uppercase transition-colors flex-shrink-0",
                         cellStyle
                       )}
                     >

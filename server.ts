@@ -8,7 +8,7 @@ import { GameStatus, Player, Room } from './src/types';
 // Simple check just to verify format. 
 // For real app, use a dictionary API or large txt file.
 async function isValidWord(word: string) {
-  if (word.length !== 6 || !/^[A-Za-z]+$/.test(word)) return false;
+  if (word.length < 3 || word.length > 8 || !/^[A-Za-z]+$/.test(word)) return false;
   try {
     const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
     return res.ok; 

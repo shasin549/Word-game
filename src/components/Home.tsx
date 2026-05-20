@@ -104,7 +104,7 @@ export function Home({ onJoin, onCreate }: HomeProps) {
                   onChange={(e) => setRoomId(e.target.value.toUpperCase())}
                   placeholder="e.g. ABCD"
                   className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-neutral-100 placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold tracking-widest uppercase"
-                  maxLength={6}
+                  maxLength={10}
                 />
               </div>
               <div className="flex gap-3">

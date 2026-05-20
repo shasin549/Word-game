@@ -21,8 +21,8 @@ export function WordSelection({ room, currentPlayerId, onSubmit }: WordSelection
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (word.length !== 6) {
-      setError('Word must be 6 letters long');
+    if (word.length < 3 || word.length > 8) {
+      setError('Word must be between 3 and 8 letters');
       return;
     }
     
@@ -46,7 +46,7 @@ export function WordSelection({ room, currentPlayerId, onSubmit }: WordSelection
   };
 
   const handleKey = (key: string) => {
-    if (word.length < 6) {
+    if (word.length < 8) {
       setWord(w => w + key.toUpperCase());
       setError('');
     }
@@ -88,7 +88,7 @@ export function WordSelection({ room, currentPlayerId, onSubmit }: WordSelection
 
       <div className="text-center mb-8">
         <h2 className="text-3xl font-black mb-2 text-white">Choose your Secret Word</h2>
-        <p className="text-neutral-500">Your opponent will try to guess this 6-letter word.</p>
+        <p className="text-neutral-500">Your opponent will try to guess this word (3 to 8 letters).</p>
       </div>
 
       {currentPlayer?.status === 'ready' ? (
@@ -103,13 +103,14 @@ export function WordSelection({ room, currentPlayerId, onSubmit }: WordSelection
         </motion.div>
       ) : (
         <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-6">
-          <div className="flex gap-2 justify-center">
-            {Array.from({ length: 6 }).map((_, i) => (
+          <div className="flex gap-1 sm:gap-2 justify-center">
+            {Array.from({ length: 8 }).map((_, i) => (
               <div 
                 key={i} 
                 className={cn(
-                  "w-12 h-14 sm:w-14 sm:h-16 flex items-center justify-center text-3xl font-black rounded-lg border-2 uppercase transition-all duration-200",
-                  word[i] ? "border-emerald-500 bg-neutral-900 text-white scale-105" : "border-neutral-800 bg-neutral-950 text-transparent"
+                  "w-10 h-12 sm:w-12 sm:h-14 flex items-center justify-center text-2xl font-black rounded-lg border-2 uppercase transition-all duration-200",
+                  word[i] ? "border-emerald-500 bg-neutral-900 text-white scale-105" : "border-neutral-800 bg-neutral-950 text-transparent",
+                  i >= word.length ? "border-dashed opacity-50" : ""
                 )}
               >
                 {word[i] || ''}
@@ -132,7 +133,7 @@ export function WordSelection({ room, currentPlayerId, onSubmit }: WordSelection
 
           <button
             type="submit"
-            disabled={word.length !== 6 || isValidating}
+            disabled={word.length < 3 || word.length > 8 || isValidating}
             className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 text-neutral-950 font-bold py-4 rounded-xl transition-all"
           >
             {isValidating ? (
@@ -151,9 +152,8 @@ export function WordSelection({ room, currentPlayerId, onSubmit }: WordSelection
             onKey={handleKey}
             onBackspace={handleBackspace}
             onEnter={() => {
-              if (word.length === 6) {
-                 // Trigger submit somehow, or just let them press the big confirm button
-                 // we can mock a submit event if we really need to, but confirm button is fine
+              if (word.length >= 3 && word.length <= 8 && !isValidating) {
+                 handleSubmit({ preventDefault: () => {} } as React.FormEvent);
               }
             }}
           />

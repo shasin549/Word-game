@@ -7,11 +7,12 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function evaluateGuess(guess: string, secret: string): GuessResult[] {
-  const result: GuessResult[] = Array.from({ length: 6 }).map((_, i) => ({ letter: guess[i], status: 'absent' }));
+  const length = secret.length;
+  const result: GuessResult[] = Array.from({ length }).map((_, i) => ({ letter: guess[i] || '', status: 'absent' }));
   const secretChars = secret.split('');
   
   // First pass: correct positions
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < length; i++) {
     if (guess[i] === secretChars[i]) {
       result[i].status = 'correct';
       secretChars[i] = '*'; // Mark as used
@@ -19,8 +20,8 @@ export function evaluateGuess(guess: string, secret: string): GuessResult[] {
   }
 
   // Second pass: present but wrong position
-  for (let i = 0; i < 6; i++) {
-    if (result[i].status !== 'correct') {
+  for (let i = 0; i < length; i++) {
+    if (result[i].status !== 'correct' && guess[i]) {
       const idx = secretChars.indexOf(guess[i]);
       if (idx !== -1) {
         result[i].status = 'present';
